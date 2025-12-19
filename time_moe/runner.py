@@ -198,16 +198,17 @@ class TimeMoeRunner:
             stride=train_config["stride"],
             normalization_method=train_config["normalization_method"],
         )
-        trainer = TimeMoeTrainer(
+        self.trainer = TimeMoeTrainer(
             model=model,
             args=training_args,
             train_dataset=train_ds,
         )
-        trainer.train()
-        trainer.save_model(self.output_path)
+        return 
+        self.trainer.train()
+        self.trainer.save_model(self.output_path)
         log_in_local_rank_0(f"Saving model to {self.output_path}")
 
-        return trainer.model
+        return self.trainer.model
 
     def get_train_dataset(self, data_path, max_length, stride, normalization_method):
         log_in_local_rank_0("Loading dataset...")
