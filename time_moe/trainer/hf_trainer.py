@@ -15,7 +15,13 @@ from transformers import get_scheduler
 class TimeMoeTrainer(transformers.Trainer):
     epsilon = 1e-8
 
-    def __init__(self, label_column: str = 'labels', loss_mask_column: str = 'loss_mask', *positional_args, **kwargs):
+    def __init__(
+        self,
+        label_column: str = "labels",
+        loss_mask_column: str = "loss_mask",
+        *positional_args,
+        **kwargs,
+    ):
         super().__init__(*positional_args, **kwargs)
         self.tokenizer = kwargs.get("tokenizer", None)
         self.label_column = label_column
@@ -25,7 +31,7 @@ class TimeMoeTrainer(transformers.Trainer):
         optimizer = self.optimizer if optimizer is None else optimizer
         min_lr_ratio = self.args.min_learning_rate / self.args.learning_rate
         if self.lr_scheduler is None:
-            if self.args.lr_scheduler_type == 'cosine':
+            if self.args.lr_scheduler_type == "cosine":
                 self.lr_scheduler = get_cosine_schedule_with_warmup_min_lr(
                     optimizer=optimizer,
                     num_warmup_steps=self.args.get_warmup_steps(num_training_steps),
@@ -48,25 +54,23 @@ class TimeMoeTrainer(transformers.Trainer):
             signature = inspect.signature(self.model.forward)
             params = list(signature.parameters.keys())
             # Labels may be named label or label_ids, the default data collator handles that.
-            self._signature_columns = list(set(
-                params + self.label_names + [
-                    "label",
-                    "label_ids",
-                    self.label_column,
-                    self.loss_mask_column
-                ]
-            ))
+            self._signature_columns = list(
+                set(params + self.label_names + ["label", "label_ids", self.label_column, self.loss_mask_column])
+            )
 
 
 @dataclass
 class TimeMoETrainingArguments(transformers.TrainingArguments):
-    min_learning_rate: float = field(
-        default=0, metadata={"help": "Minimum learning rate for cosine_schedule"}
-    )
+    min_learning_rate: float = field(default=0, metadata={"help": "Minimum learning rate for cosine_schedule"})
 
 
 def _get_cosine_schedule_with_warmup_and_min_lr_lambda(
-        current_step: int, *, num_warmup_steps: int, num_training_steps: int, num_cycles: float, min_lr_ratio: float,
+    current_step: int,
+    *,
+    num_warmup_steps: int,
+    num_training_steps: int,
+    num_cycles: float,
+    min_lr_ratio: float,
 ):
     if current_step < num_warmup_steps:
         return float(current_step) / float(max(1, num_warmup_steps))
@@ -77,12 +81,12 @@ def _get_cosine_schedule_with_warmup_and_min_lr_lambda(
 
 
 def get_cosine_schedule_with_warmup_min_lr(
-        optimizer: torch.optim.Optimizer,
-        num_warmup_steps: int,
-        num_training_steps: int,
-        num_cycles: float = 0.5,
-        min_lr_ratio: float = 0,
-        last_epoch: int = -1
+    optimizer: torch.optim.Optimizer,
+    num_warmup_steps: int,
+    num_training_steps: int,
+    num_cycles: float = 0.5,
+    min_lr_ratio: float = 0,
+    last_epoch: int = -1,
 ):
     lr_lambda = partial(
         _get_cosine_schedule_with_warmup_and_min_lr_lambda,

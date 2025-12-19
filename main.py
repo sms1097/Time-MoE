@@ -30,19 +30,11 @@ if __name__ == "__main__":
         default=None,
         help="Step size for sliding the time-series window. Defaults to the value of max_length if not specified.",
     )
-    parser.add_argument(
-        "--learning_rate", type=float, default=1e-4, help="learning rate"
-    )
-    parser.add_argument(
-        "--min_learning_rate", type=float, default=5e-5, help="minimum learning rate"
-    )
+    parser.add_argument("--learning_rate", type=float, default=1e-4, help="learning rate")
+    parser.add_argument("--min_learning_rate", type=float, default=5e-5, help="minimum learning rate")
 
-    parser.add_argument(
-        "--train_steps", type=int, default=None, help="number of training steps"
-    )
-    parser.add_argument(
-        "--num_train_epochs", type=float, default=1.0, help="number of training epochs"
-    )
+    parser.add_argument("--train_steps", type=int, default=None, help="number of training steps")
+    parser.add_argument("--num_train_epochs", type=float, default=1.0, help="number of training epochs")
     parser.add_argument(
         "--normalization_method",
         type=str,
@@ -71,12 +63,8 @@ if __name__ == "__main__":
     parser.add_argument("--warmup_steps", type=int, default=0, help="warmup steps")
     parser.add_argument("--weight_decay", type=float, default=0.1, help="weight decay")
 
-    parser.add_argument(
-        "--global_batch_size", type=int, default=64, help="global batch size"
-    )
-    parser.add_argument(
-        "--micro_batch_size", type=int, default=16, help="micro batch size per device"
-    )
+    parser.add_argument("--global_batch_size", type=int, default=64, help="global batch size")
+    parser.add_argument("--micro_batch_size", type=int, default=16, help="micro batch size per device")
 
     parser.add_argument(
         "--precision",
@@ -90,16 +78,10 @@ if __name__ == "__main__":
         action="store_true",
         help="enable gradient checkpointing",
     )
-    parser.add_argument(
-        "--deepspeed", type=str, default=None, help="DeepSpeed config file path"
-    )
+    parser.add_argument("--deepspeed", type=str, default=None, help="DeepSpeed config file path")
 
-    parser.add_argument(
-        "--from_scratch", action="store_true", help="train from scratch"
-    )
-    parser.add_argument(
-        "--save_steps", type=int, default=None, help="number of steps to save model"
-    )
+    parser.add_argument("--from_scratch", action="store_true", help="train from scratch")
+    parser.add_argument("--save_steps", type=int, default=None, help="number of steps to save model")
     parser.add_argument(
         "--save_strategy",
         choices=["steps", "epoch", "no"],
@@ -113,13 +95,9 @@ if __name__ == "__main__":
         default=None,
         help="limit the number of checkpoints",
     )
-    parser.add_argument(
-        "--save_only_model", action="store_true", help="save only model"
-    )
+    parser.add_argument("--save_only_model", action="store_true", help="save only model")
 
-    parser.add_argument(
-        "--logging_steps", type=int, default=1, help="number of steps to log"
-    )
+    parser.add_argument("--logging_steps", type=int, default=1, help="number of steps to log")
     parser.add_argument(
         "--evaluation_strategy",
         choices=["steps", "epoch", "no"],
@@ -127,16 +105,12 @@ if __name__ == "__main__":
         default="no",
         help="evaluation strategy",
     )
-    parser.add_argument(
-        "--eval_steps", type=int, default=None, help="number of evaluation steps"
-    )
+    parser.add_argument("--eval_steps", type=int, default=None, help="number of evaluation steps")
 
     parser.add_argument("--adam_beta1", type=float, default=0.9, help="adam beta1")
     parser.add_argument("--adam_beta2", type=float, default=0.95, help="adam beta2")
     parser.add_argument("--adam_epsilon", type=float, default=1e-8, help="adam epsilon")
-    parser.add_argument(
-        "--max_grad_norm", type=float, default=1.0, help="max gradient norm"
-    )
+    parser.add_argument("--max_grad_norm", type=float, default=1.0, help="max gradient norm")
     parser.add_argument(
         "--dataloader_num_workers",
         type=int,

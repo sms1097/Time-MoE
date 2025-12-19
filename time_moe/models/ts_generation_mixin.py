@@ -5,35 +5,38 @@ import torch
 
 from transformers import GenerationMixin, LogitsProcessorList, StoppingCriteriaList
 from transformers.generation import validate_stopping_criteria, EosTokenCriteria
-from transformers.generation.utils import GenerateNonBeamOutput, GenerateEncoderDecoderOutput, GenerateDecoderOnlyOutput
+from transformers.generation.utils import (
+    GenerateNonBeamOutput,
+    GenerateEncoderDecoderOutput,
+    GenerateDecoderOnlyOutput,
+)
 from transformers.utils import ModelOutput
 
 
 class TSGenerationMixin(GenerationMixin):
-
     def _greedy_search(
-            self,
-            input_ids: torch.Tensor,
-            logits_processor: Optional[LogitsProcessorList] = None,
-            stopping_criteria: Optional[StoppingCriteriaList] = None,
-            max_length: Optional[int] = None,
-            pad_token_id: Optional[int] = None,
-            eos_token_id: Optional[Union[int, List[int]]] = None,
-            output_attentions: Optional[bool] = None,
-            output_hidden_states: Optional[bool] = None,
-            output_scores: Optional[bool] = None,
-            output_logits: Optional[bool] = None,
-            return_dict_in_generate: Optional[bool] = None,
-            synced_gpus: bool = False,
-            streamer: Optional["BaseStreamer"] = None,
-            **model_kwargs,
+        self,
+        input_ids: torch.Tensor,
+        logits_processor: Optional[LogitsProcessorList] = None,
+        stopping_criteria: Optional[StoppingCriteriaList] = None,
+        max_length: Optional[int] = None,
+        pad_token_id: Optional[int] = None,
+        eos_token_id: Optional[Union[int, List[int]]] = None,
+        output_attentions: Optional[bool] = None,
+        output_hidden_states: Optional[bool] = None,
+        output_scores: Optional[bool] = None,
+        output_logits: Optional[bool] = None,
+        return_dict_in_generate: Optional[bool] = None,
+        synced_gpus: bool = False,
+        streamer: Optional["BaseStreamer"] = None,
+        **model_kwargs,
     ) -> Union[GenerateNonBeamOutput, torch.Tensor]:
         input_ids_origin_device = input_ids.device
         input_ids = input_ids.to(self.device)
         if len(input_ids.shape) == 2:
             batch_size, cur_len = input_ids.shape
         else:
-            raise ValueError('Input shape must be: [batch_size, seq_len]')
+            raise ValueError("Input shape must be: [batch_size, seq_len]")
         # init values
         logits_processor = logits_processor if logits_processor is not None else LogitsProcessorList()
         stopping_criteria = stopping_criteria if stopping_criteria is not None else StoppingCriteriaList()
@@ -133,9 +136,7 @@ class TSGenerationMixin(GenerationMixin):
 
                 if output_hidden_states:
                     decoder_hidden_states += (
-                        (outputs.decoder_hidden_states,)
-                        if self.config.is_encoder_decoder
-                        else (outputs.hidden_states,)
+                        (outputs.decoder_hidden_states,) if self.config.is_encoder_decoder else (outputs.hidden_states,)
                     )
 
             # argmax
@@ -198,12 +199,12 @@ class TSGenerationMixin(GenerationMixin):
             return input_ids
 
     def _update_model_kwargs_for_generation(
-            self,
-            outputs: ModelOutput,
-            model_kwargs: Dict[str, Any],
-            horizon_length: int = 1,
-            is_encoder_decoder: bool = False,
-            standardize_cache_format: bool = False,
+        self,
+        outputs: ModelOutput,
+        model_kwargs: Dict[str, Any],
+        horizon_length: int = 1,
+        is_encoder_decoder: bool = False,
+        standardize_cache_format: bool = False,
     ) -> Dict[str, Any]:
         # update past_key_values
         model_kwargs["past_key_values"] = self._extract_past_from_model_output(
@@ -222,14 +223,21 @@ class TSGenerationMixin(GenerationMixin):
             if "attention_mask" in model_kwargs:
                 attention_mask = model_kwargs["attention_mask"]
                 model_kwargs["attention_mask"] = torch.cat(
-                    [attention_mask, attention_mask.new_ones((attention_mask.shape[0], horizon_length))], dim=-1
+                    [
+                        attention_mask,
+                        attention_mask.new_ones((attention_mask.shape[0], horizon_length)),
+                    ],
+                    dim=-1,
                 )
         else:
             # update decoder attention mask
             if "decoder_attention_mask" in model_kwargs:
                 decoder_attention_mask = model_kwargs["decoder_attention_mask"]
                 model_kwargs["decoder_attention_mask"] = torch.cat(
-                    [decoder_attention_mask, decoder_attention_mask.new_ones((decoder_attention_mask.shape[0], horizon_length))],
+                    [
+                        decoder_attention_mask,
+                        decoder_attention_mask.new_ones((decoder_attention_mask.shape[0], horizon_length)),
+                    ],
                     dim=-1,
                 )
 
